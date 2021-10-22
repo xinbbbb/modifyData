@@ -46,11 +46,13 @@ app.get('/export', (req, res) => {
             // Write to file
             try {
                 fs.writeFileSync(fileName, JSON.stringify(docs));
+                res.status(200)
                 res.send('Done writing to file')
 
                 console.log('Done writing to file.');
             }
             catch (err) {
+                res.status(400);
                 console.log('Error writing to file', err)
             }
         });
@@ -73,14 +75,15 @@ app.post('/import', multipartyMiddleware, (req, res) => {
     
             const db = client.db(dbName);
     
+            const path = req.files.myfile.path
             // import
-            const data = fs.readFileSync(req.files.myfile.path)
+            const data = fs.readFileSync(path)
             const docs = JSON.parse(data.toString());
             // const docs = req.body;
     
             insertData(db, clName, docs, () => {
                 res.status(200)
-                res.json(req.body)
+                res.json(docs)
     
                 console.log('Closing connection.');
                 client.close();

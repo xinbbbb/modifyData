@@ -14,15 +14,20 @@
       <input type="file" accept="application/JSON" name="myfile"/>
     </form>
 
-    <button style="margin-top: 20px;height: 30px;width: 90px;cursor: pointer;" id='uploadBtn'>upload json</button>
+    <button style="margin-top: 20px;height: 30px;width: 90px;" id='uploadBtn'>import json</button>
+
+    <h3>============================================</h3>
+
+    <button style="margin-top: 10px;height: 30px;width: 90px;" id='exportBtn'>export</button>
 
   </body>
 
   <script>
 
-    const button = document.getElementById('uploadBtn');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const exportButton = document.getElementById('exportBtn');
 
-    button.addEventListener('click', function(e) {
+    uploadBtn.addEventListener('click', function(e) {
       
       const xhr = new XMLHttpRequest();
 
@@ -42,5 +47,21 @@
       xhr.send(formData);
 
     });
+
+    exportButton.addEventListener('click', function(e) {
+      const xhr = new XMLHttpRequest();
+
+      xhr.onload = () => {
+        if(xhr.status === 200) {
+          alert('export success')
+        } else {
+          alert('export fail, please check again...')
+        }
+      }
+
+      xhr.open("get", "/export", true);
+      xhr.send();
+    });
+
   </script>
 </html>
