@@ -12,10 +12,10 @@ const { exportData } = require('./exportData');
 const { insertData } = require('./importData');
 
 // Database Name
-const dbName = 'myProject';
+const dbName = 'testDBName';
 
 // collection Name
-const clName = 'outCollection'
+const clName = 'testCollection'
 
 app.use(express.static('public'));
 app.use(express.json()) // for parsing application/json
@@ -65,11 +65,11 @@ app.post('/import', multipartyMiddleware, (req, res) => {
     const url = 'mongodb://localhost:27017';
     const client = new MongoClient(url);
 
-    console.log(req.files)
-
     // file exist
     if(req.files.myfile && req.files.myfile.size !== 0){
         client.connect(err => {
+
+            const [dbName, clName] = req.files.myfile.originalFilename.split('.')[0].split('-')
 
             console.log('Connected successfully to server');
     
