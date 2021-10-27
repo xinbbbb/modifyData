@@ -1,21 +1,15 @@
 const express = require('express')
 const multipart = require('connect-multiparty');
 const multipartyMiddleware = multipart();
+const fs = require('fs');
 
 const app = express()
 const port = 3001
 
 const { MongoClient } = require('mongodb');
-// or as an es module:
-// import { MongoClient } from 'mongodb'
-const fs = require('fs');
 
 const { exportData } = require('./exportData');
 const { insertData } = require('./importData');
-
-// Connection URL
-const url = 'mongodb://localhost:27017';
-const client = new MongoClient(url);
 
 // Database Name
 const dbName = 'myProject';
@@ -23,14 +17,18 @@ const dbName = 'myProject';
 // collection Name
 const clName = 'outCollection'
 
-// file Name
-const fileName = 'out_file.json'
-
 app.use(express.static('public'));
 app.use(express.json()) // for parsing application/json
 app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
 
 app.get('/export', (req, res) => {
+
+    // TODO: Connection exportClient URL, Such as SIT
+    const url = 'mongodb://localhost:27017';
+    const client = new MongoClient(url);
+
+    // file Name
+    const fileName = `${dbName}-${clName}.json`
 
     client.connect(err => {
 
@@ -63,12 +61,14 @@ app.get('/export', (req, res) => {
 
 app.post('/import', multipartyMiddleware, (req, res) => {
 
-    // console.log(req.headers)
+    // Connection importClient URL, Such as local
+    const url = 'mongodb://localhost:27017';
+    const client = new MongoClient(url);
 
     console.log(req.files)
 
     // file exist
-    if(req.files?.myfile?.size){
+    if(req.files.myfile && req.files.myfile.size !== 0){
         client.connect(err => {
 
             console.log('Connected successfully to server');

@@ -2,7 +2,6 @@
   "dependencies": {
     "connect-multiparty": "^2.2.0",
     "express": "^4.17.1",
-    "formidable": "^1.2.2",
     "mongodb": "^4.1.3"
   }
 }

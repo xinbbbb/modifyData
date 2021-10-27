@@ -1,22 +1,12 @@
 [
   {
-    "_id": "616f8260535b85936d373840",
-    "name": "hello1 world",
+    "_id": "6162827fbe61491b0e224e10",
+    "name": "im repeat data",
     "insertTime": 1634697824463
   },
   {
-    "_id": "616f827fbe61491b0e224e10",
-    "name": "hello1 world",
+    "_id": "616f8260535b85936d373840",
+    "name": "im new data",
     "insertTime": 1634697855956
-  },
-  {
-    "_id": "616fb948f5cebf2bde0d811e",
-    "name": "hello1 world",
-    "insertTime": 1634711880935
-  },
-  {
-    "_id": "6170d43adac2be3b6c84b070",
-    "name": "hello1 world",
-    "insertTime": 1634784314340
   }
 ]

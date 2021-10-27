@@ -8,7 +8,7 @@ To install node_modules
 
 To start app listening at http://localhost:3001
 
-To start import or export data via out_file.json
+Rule with export file name: databaseName + collectionName .json
 
 ### usage
 
