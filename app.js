@@ -11,17 +11,20 @@ const { MongoClient } = require('mongodb');
 const { exportData } = require('./exportData');
 const { insertData } = require('./importData');
 
-// Database Name
-const dbName = 'testDBName';
-
-// collection Name
-const clName = 'testCollection'
 
 app.use(express.static('public'));
 app.use(express.json()) // for parsing application/json
 app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
 
-app.get('/export', (req, res) => {
+app.post('/export', (req, res) => {
+
+    const params = JSON.parse(Object.keys(req.body)[0])
+
+    // Database Name
+    const dbName = params.dbName;
+
+    // collection Name
+    const clName = params.clName
 
     // TODO: Connection exportClient URL, Such as SIT
     const url = 'mongodb://localhost:27017';
@@ -41,11 +44,16 @@ app.get('/export', (req, res) => {
             console.log('Closing connection.');
             client.close();
 
-            // Write to file
             try {
-                fs.writeFileSync(fileName, JSON.stringify(docs));
-                res.status(200)
-                res.send('Done writing to file')
+                 // json to Buffer
+                const json = JSON.stringify(docs);
+                const buf = Buffer.from(json);
+                res.writeHead(200, {
+                    'Content-Type': 'application/octet-stream',
+                    'Content-disposition': `attachment; filename=${fileName}`
+                });
+                res.write(buf);
+                res.end();
 
                 console.log('Done writing to file.');
             }
@@ -79,7 +87,6 @@ app.post('/import', multipartyMiddleware, (req, res) => {
             // import
             const data = fs.readFileSync(path)
             const docs = JSON.parse(data.toString());
-            // const docs = req.body;
     
             insertData(db, clName, docs, () => {
                 res.status(200)
