@@ -9,7 +9,7 @@
   <body>
     
     <h1>Node + Express + MongoDb example</h1>
-    <p>import rule(file name): DBName - collectionName .json</p>
+    <p>import rule(file name): DBName $ collectionName .json</p>
     <form id="formid" method="POST" enctype="multipart/form-data">
       <input style="width: 500px;" type="file" accept="application/JSON" name="myfile"/>
     </form>
@@ -19,11 +19,15 @@
     <h3>============================================</h3>
     <div>
       <label>Database name:</label>
-      <input id="dbNameInput" style="width: 200px;height: 30px;" placeholder="Type database name to export"/>
+      <select id="dbNameSelect" style="width: 150px;height: 30px;">
+    
+      </select>
+      <!-- <input id="dbNameInput" style="width: 200px;height: 30px;" placeholder="Type database name to export"/> -->
     </div>
     <div style="margin-top: 10px;">
       <label>Collection name:</label>
-      <input id="clNameInput" style="width: 200px;height: 30px;" placeholder="Type collection name to export"/>
+      <!-- <input id="clNameInput" style="width: 200px;height: 30px;" placeholder="Type collection name to export"/> -->
+      <select id="clNameSelect" style="width: 150px;height: 30px;"></select>
     </div>
 
     <button style="margin-top: 10px;height: 30px;width: 90px;" id='exportBtn'>export</button>
@@ -32,8 +36,59 @@
 
   <script>
 
+    const dbSelect = document.getElementById('dbNameSelect')
+    const clNameSelect = document.getElementById('clNameSelect')
+
     const uploadBtn = document.getElementById('uploadBtn');
     const exportButton = document.getElementById('exportBtn');
+
+    const getCollectionList = dbName => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', `/collections/${dbName}`, true);
+      xhr.onload = ()=> {
+        if(xhr.status === 200) {
+
+          const list = JSON.parse(xhr.response)
+
+          const fragement = document.createDocumentFragment()
+          for(let i = 0; i< list.length; i++) {
+            let option = document.createElement('option')
+            option.value = list[i]
+            option.label = list[i]
+            fragement.appendChild(option)
+          }
+          clNameSelect.appendChild(fragement)
+        }
+      }
+      xhr.send();
+    }
+
+    const getDataList = ()=> {
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', "/databases", true);
+      xhr.onload = ()=> {
+        if(xhr.status === 200) {
+
+          const list = JSON.parse(xhr.response)
+
+          const fragement = document.createDocumentFragment()
+          for(let i = 0; i< list.length; i++) {
+            let option = document.createElement('option')
+            option.value = list[i]
+            option.label = list[i]
+            fragement.appendChild(option)
+          }
+          dbSelect.appendChild(fragement)
+
+          //query collection
+          getCollectionList(list[0])
+        }
+      }
+      xhr.send();
+    }
+
+    // initical request
+    getDataList()
 
     uploadBtn.addEventListener('click', function(e) {
       
@@ -57,17 +112,19 @@
     });
 
     exportButton.addEventListener('click', function(e) {
-
+     
       // validate
-      const dbName = document.getElementById('dbNameInput').value
-      const clName = document.getElementById('clNameInput').value
+      // const dbName = document.getElementById('dbNameInput').value
+      // const clName = document.getElementById('clNameInput').value
+      const dbName = dbSelect.value
+      const clName = clNameSelect.value
 
       if(!dbName) {
-        alert('Please type database name...')
+        alert('Please select database name...')
         return
       }
       if(!clName) {
-        alert('Please type collection name...')
+        alert('Please select collection name...')
         return
       }
         
@@ -116,5 +173,9 @@
 
     });
 
+    dbSelect.addEventListener('change', function(e){
+      clNameSelect.innerHTML = '';
+      getCollectionList(e.target.value)
+    })
   </script>
 </html>

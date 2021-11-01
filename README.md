@@ -8,13 +8,9 @@ To install node_modules
 
 To start app listening at http://localhost:3001
 
-Rule with export file name: databaseName + collectionName .json
+Rule with export file name: databaseName / collectionName .json
 
 ### usage
-
-default dbName = 'myProject'
-default collectionName = 'outCollection'
-default fileName = 'out_file.json' 
 
 #####API :
 http://localhost:3001/import

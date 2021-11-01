@@ -16,6 +16,44 @@ app.use(express.static('public'));
 app.use(express.json()) // for parsing application/json
 app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
 
+app.get('/databases', (req, res) => {
+    const url = 'mongodb://localhost:27017';
+    const dbName = 'test';
+
+    const mongoClient = new MongoClient(url);
+    mongoClient.connect(function(err, client) {
+
+        // Use the admin database for the operation
+        const adminDb = client.db(dbName).admin();
+
+        // List all the available databases
+        adminDb.listDatabases((err, dbs) => {
+            const dbList = dbs.databases.filter(item => !item.empty).map(item => item.name)
+            res.end(JSON.stringify(dbList));
+
+            client.close();
+        });
+    });
+})
+
+app.get('/collections/:name', (req, res) => {
+    const url = 'mongodb://localhost:27017';
+    const dbName = req.params.name;
+
+    const mongoClient = new MongoClient(url);
+    mongoClient.connect(async (err, client) =>{
+
+        // Use the admin database for the operation
+        const db = client.db(dbName);
+
+        const collections = await db.collections()
+        const collectionList = collections.map(item => item.s.namespace.collection)
+
+        res.end(JSON.stringify(collectionList));
+        client.close();
+    });
+})
+
 app.post('/export', (req, res) => {
 
     const params = JSON.parse(Object.keys(req.body)[0])
@@ -31,7 +69,7 @@ app.post('/export', (req, res) => {
     const client = new MongoClient(url);
 
     // file Name
-    const fileName = `${dbName}-${clName}.json`
+    const fileName = `${dbName}$${clName}.json`
 
     client.connect(err => {
 
@@ -77,8 +115,8 @@ app.post('/import', multipartyMiddleware, (req, res) => {
     if(req.files.myfile && req.files.myfile.size !== 0){
         client.connect(err => {
 
-            const [dbName, clName] = req.files.myfile.originalFilename.split('.')[0].split('-')
-
+            const [ dbName, clName ] = req.files.myfile.originalFilename.split('.')[0].split('$')
+            // avoid collectionName include  /
             console.log('Connected successfully to server');
     
             const db = client.db(dbName);
